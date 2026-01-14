@@ -9,19 +9,17 @@ import chatRoutes from "./routes/chat.route.js";
 
 import connectDB from "./lib/db.js";
 
-dotenv.config(); // ✅ VERY IMPORTANT
+dotenv.config();
 
 const app = express();
-
-// ✅ SAFE PORT (local + production)
 const PORT = process.env.PORT || 5001;
 
-// ✅ CORS (local + production)
+// ✅ CORS (LOCAL + VERCEL)
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://your-frontend.vercel.app" // ⬅️ change this
+      "https://streamify-video-calls-master-qf8oas7jd.vercel.app"
     ],
     credentials: true,
   })
@@ -30,24 +28,24 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ API routes
+// ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 
-// ✅ Health check (Railway/Render useful)
+// HEALTH CHECK
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
-// ✅ Start server AFTER DB connect
+// START SERVER AFTER DB CONNECT
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`✅ Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("DB connection failed ❌", err);
+    console.error("❌ DB connection failed", err);
     process.exit(1);
   });
