@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import HomePage from "./pages/HomePage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
@@ -13,11 +13,13 @@ import { Toaster } from "react-hot-toast";
 import PageLoader from "./components/PageLoader.jsx";
 import useAuthUser from "./hooks/useAuthUser.js";
 import Layout from "./components/Layout.jsx";
-import { useThemeStore } from "./store/useThemeStore.js";
+import useThemeStore from "./store/useThemeStore.js";
+
+import  useNotificationStore  from "./store/useNotificationStore.js";
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
-  const { theme } = useThemeStore();
+  const { theme } = useNotificationStore();
 
   const isAuthenticated = Boolean(authUser);
   const isOnboarded = authUser?.isOnboarded;
@@ -27,6 +29,7 @@ const App = () => {
   return (
     <div className="h-screen" data-theme={theme}>
       <Routes>
+        {/* HOME / FRIENDS */}
         <Route
           path="/"
           element={
@@ -39,18 +42,45 @@ const App = () => {
             )
           }
         />
+
+        {/* FRIENDS (FIXED) */}
+        <Route
+          path="/friends"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <HomePage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+
+        {/* AUTH */}
         <Route
           path="/signup"
           element={
-            !isAuthenticated ? <SignUpPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            !isAuthenticated ? (
+              <SignUpPage />
+            ) : (
+              <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            )
           }
         />
+
         <Route
           path="/login"
           element={
-            !isAuthenticated ? <LoginPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            !isAuthenticated ? (
+              <LoginPage />
+            ) : (
+              <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            )
           }
         />
+
+        {/* NOTIFICATIONS */}
         <Route
           path="/notifications"
           element={
@@ -63,17 +93,8 @@ const App = () => {
             )
           }
         />
-        <Route
-          path="/call/:id"
-          element={
-            isAuthenticated && isOnboarded ? (
-              <CallPage />
-            ) : (
-              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
-            )
-          }
-        />
 
+        {/* CHAT */}
         <Route
           path="/chat/:id"
           element={
@@ -87,6 +108,19 @@ const App = () => {
           }
         />
 
+        {/* VIDEO CALL */}
+        <Route
+          path="/call/:id"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <CallPage />
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+
+        {/* ONBOARDING */}
         <Route
           path="/onboarding"
           element={
@@ -107,4 +141,5 @@ const App = () => {
     </div>
   );
 };
+
 export default App;
