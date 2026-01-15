@@ -13,16 +13,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ✅ CORS — ONLY FRONTEND DOMAIN (NO /api)
+// ✅ CORS (Frontend domains ONLY)
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "streamify-video-calls-master-six.vercel.app"
+      "https://streamify-video-calls-master-six.vercel.app",
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
+
+// ✅ IMPORTANT for preflight requests
+app.options("*", cors());
 
 app.use(express.json());
 app.use(cookieParser());
@@ -32,12 +36,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 
+// HEALTH CHECK
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
 });
 
+// START SERVER
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`Server running on ${PORT}`);
+    console.log(`✅ Server running on ${PORT}`);
   });
 });
