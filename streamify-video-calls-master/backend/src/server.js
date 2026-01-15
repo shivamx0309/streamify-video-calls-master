@@ -22,8 +22,13 @@ app.use(
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// ✅ VERY IMPORTANT (preflight fix)
+app.options("*", cors());
+
 
 // ✅ IMPORTANT for preflight requests
 app.options("*", cors());
