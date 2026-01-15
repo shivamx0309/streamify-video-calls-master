@@ -22,11 +22,13 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://streamify-video-calls-master-qf8oas7jd.vercel.app"
+      "https://chat-app-upsg.onrender.com/api",
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
+
 
 app.use(express.json());
 app.use(cookieParser());
