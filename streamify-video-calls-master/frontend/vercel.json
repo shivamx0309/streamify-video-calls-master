@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://chat-app-upsg.onrender.com/api/$1"
+      "destination": "https://streamify-video-calls-master-doyd.vercel.app/api/$1"
     }
   ]
 }
