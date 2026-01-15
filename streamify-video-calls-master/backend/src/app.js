@@ -25,6 +25,17 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// 🔥 CONNECT DB PER REQUEST SAFELY
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: "DB connection failed" });
+  }
+});
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
@@ -32,7 +43,5 @@ app.use("/api/chat", chatRoutes);
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API running" });
 });
-
-await connectDB();
 
 export default app;
