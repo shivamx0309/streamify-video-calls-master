@@ -1,12 +1,12 @@
-import { upsertStreamUser } from "../lib/stream.js";
-import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import { upsertStreamUser } from "../lib/stream.js";
 
 const COOKIE_OPTIONS = {
   maxAge: 7 * 24 * 60 * 60 * 1000,
   httpOnly: true,
-  sameSite: "none", //  REQUIRED for cross-domain
-  secure: true,     //  REQUIRED on HTTPS
+  sameSite: "none",
+  secure: true
 };
 
 export async function signup(req, res) {
@@ -15,10 +15,6 @@ export async function signup(req, res) {
 
     if (!email || !password || !fullName) {
       return res.status(400).json({ message: "All fields are required" });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -33,23 +29,24 @@ export async function signup(req, res) {
       email,
       fullName,
       password,
-      profilePic,
+      profilePic
     });
 
     await upsertStreamUser({
       id: user._id.toString(),
       name: user.fullName,
-      image: user.profilePic,
+      image: user.profilePic
     });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "7d" }
+    );
 
     res.cookie("jwt", token, COOKIE_OPTIONS);
     res.status(201).json({ success: true, user });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Signup failed" });
   }
 }
@@ -63,14 +60,15 @@ export async function login(req, res) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "7d" }
+    );
 
     res.cookie("jwt", token, COOKIE_OPTIONS);
-    res.status(200).json({ success: true, user });
-  } catch (err) {
-    console.error(err);
+    res.json({ success: true, user });
+  } catch {
     res.status(500).json({ message: "Login failed" });
   }
 }
@@ -78,7 +76,7 @@ export async function login(req, res) {
 export function logout(req, res) {
   res.clearCookie("jwt", {
     sameSite: "none",
-    secure: true,
+    secure: true
   });
   res.json({ success: true });
 }
