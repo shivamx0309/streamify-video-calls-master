@@ -12,30 +12,33 @@ dotenv.config();
 
 const app = express();
 
+const FRONTEND_URL = "https://streamify-video-calls-master-six.vercel.app";
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://streamify-video-calls-master-six.vercel.app"
-    ],
-    credentials: true
+    origin: FRONTEND_URL,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
+
+// very important for preflight
+app.options("*", cors());
 
 app.use(express.json());
 app.use(cookieParser());
 
-// 🔥 CONNECT DB PER REQUEST SAFELY
+// connect DB lazily (serverless safe)
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
   } catch (err) {
-    res.status(500).json({ message: "DB connection failed" });
+    return res.status(500).json({ message: "DB connection failed" });
   }
 });
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
